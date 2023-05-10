@@ -15,7 +15,7 @@ stdenv.mkDerivation {
   #configureFlags = [ "--help" ];
   configureFlags = [ "--enable-benchmark=no" ];
 
-  patches = [ ./zs-crc32-nonhw.patch ];
+  patches = [ ./use-crc32c-polyfill-func.patch ./unexport-nonportable-symbols.patch ];
 
   nativeBuildInputs = [
     cunit
@@ -39,5 +39,5 @@ stdenv.mkDerivation {
     check
   ];
 
-  doCheck = true;
+  doCheck = stdenv.isLinux;
 }

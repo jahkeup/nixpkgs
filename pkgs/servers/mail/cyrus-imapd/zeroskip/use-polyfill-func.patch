@@ -1,0 +1,298 @@
+From bd98ad13b906b6306c880d8dca2f7f0dc109bf15 Mon Sep 17 00:00:00 2001
+From: Jacob Vallejo <jake@jahkeup.com>
+Date: Tue, 9 May 2023 00:12:30 -0700
+Subject: [PATCH] building
+
+---
+ src/mfile.c            |  2 +-
+ src/zeroskip-dotzsdb.c | 40 ++++++++++++++++++++--------------------
+ src/zeroskip-file.c    |  8 ++++----
+ src/zeroskip-header.c  | 26 +++++++++++++-------------
+ src/zeroskip-packed.c  | 12 ++++++------
+ src/zeroskip-record.c  | 16 ++++++++--------
+ 6 files changed, 52 insertions(+), 52 deletions(-)
+
+diff --git a/src/mfile.c b/src/mfile.c
+index 278433d..2bbb848 100644
+--- a/src/mfile.c
++++ b/src/mfile.c
+@@ -535,7 +535,7 @@ uint32_t crc32_end(struct mfile **mfp)
+ {
+         if ((*mfp)->compute_crc) {
+                 (*mfp)->crc32_data_len = (*mfp)->offset - (*mfp)->crc32_begin_offset;
+-                (*mfp)->crc32 = crc32c_hw((*mfp)->crc32,
++                (*mfp)->crc32 = crc32c((*mfp)->crc32,
+                                           ((*mfp)->ptr + (*mfp)->crc32_begin_offset),
+                                           (*mfp)->crc32_data_len);
+                 (*mfp)->compute_crc = 0;
+diff --git a/src/zeroskip-dotzsdb.c b/src/zeroskip-dotzsdb.c
+index 69d1db4..16a7a54 100644
+--- a/src/zeroskip-dotzsdb.c
++++ b/src/zeroskip-dotzsdb.c
+@@ -103,17 +103,17 @@ int zs_dotzsdb_create(struct zsdb_priv *priv)
+         sptr += sizeof(uint32_t);
+ 
+         /* CRC */
+-        priv->dotzsdb.crc = crc32c_hw(0, 0, 0);
+-        priv->dotzsdb.crc = crc32c_hw(priv->dotzsdb.crc,
++        priv->dotzsdb.crc = crc32c(0, 0, 0);
++        priv->dotzsdb.crc = crc32c(priv->dotzsdb.crc,
+                                       (void *)&priv->dotzsdb.signature,
+                                       sizeof(uint64_t));
+-        priv->dotzsdb.crc = crc32c_hw(priv->dotzsdb.crc,
++        priv->dotzsdb.crc = crc32c(priv->dotzsdb.crc,
+                                       (void *)&priv->dotzsdb.offset,
+                                       sizeof(uint64_t));
+-        priv->dotzsdb.crc = crc32c_hw(priv->dotzsdb.crc,
++        priv->dotzsdb.crc = crc32c(priv->dotzsdb.crc,
+                                       (void *)&priv->dotzsdb.uuidstr,
+                                       UUID_STRLEN);
+-        priv->dotzsdb.crc = crc32c_hw(priv->dotzsdb.crc,
++        priv->dotzsdb.crc = crc32c(priv->dotzsdb.crc,
+                                       (void *)&priv->dotzsdb.curidx,
+                                       sizeof(uint32_t));
+         *((uint32_t *)sptr) = hton32(priv->dotzsdb.crc);
+@@ -202,14 +202,14 @@ int zs_dotzsdb_validate(struct zsdb_priv *priv)
+                 priv->dotzsdb.curidx = ntoh32(dothdr->curidx);
+ 
+                 /* Verify CRC */
+-                crc = crc32c_hw(0, 0, 0);
+-                crc = crc32c_hw(crc, (void *)&priv->dotzsdb.signature,
++                crc = crc32c(0, 0, 0);
++                crc = crc32c(crc, (void *)&priv->dotzsdb.signature,
+                                 sizeof(uint64_t));
+-                crc = crc32c_hw(crc, (void *)&priv->dotzsdb.offset,
++                crc = crc32c(crc, (void *)&priv->dotzsdb.offset,
+                                 sizeof(uint64_t));
+-                crc = crc32c_hw(crc, (void *)&priv->dotzsdb.uuidstr,
++                crc = crc32c(crc, (void *)&priv->dotzsdb.uuidstr,
+                                 UUID_STRLEN);
+-                crc = crc32c_hw(crc, (void *)&priv->dotzsdb.curidx,
++                crc = crc32c(crc, (void *)&priv->dotzsdb.curidx,
+                                 sizeof(uint32_t));
+ 
+                 if (crc != ntoh32(dothdr->crc)) {
+@@ -427,14 +427,14 @@ int zs_dotzsdb_update_begin(struct zsdb_priv *priv)
+                 priv->dotzsdb.curidx = ntoh32(dothdr->curidx);
+ 
+                 /* Verify CRC */
+-                crc = crc32c_hw(0, 0, 0);
+-                crc = crc32c_hw(crc, (void *)&priv->dotzsdb.signature,
++                crc = crc32c(0, 0, 0);
++                crc = crc32c(crc, (void *)&priv->dotzsdb.signature,
+                                 sizeof(uint64_t));
+-                crc = crc32c_hw(crc, (void *)&priv->dotzsdb.offset,
++                crc = crc32c(crc, (void *)&priv->dotzsdb.offset,
+                                 sizeof(uint64_t));
+-                crc = crc32c_hw(crc, (void *)&priv->dotzsdb.uuidstr,
++                crc = crc32c(crc, (void *)&priv->dotzsdb.uuidstr,
+                                 UUID_STRLEN);
+-                crc = crc32c_hw(crc, (void *)&priv->dotzsdb.curidx,
++                crc = crc32c(crc, (void *)&priv->dotzsdb.curidx,
+                                 sizeof(uint32_t));
+ 
+                 if (crc != ntoh32(dothdr->crc)) {
+@@ -512,17 +512,17 @@ int zs_dotzsdb_update_end(struct zsdb_priv *priv)
+         sptr += sizeof(uint32_t);
+ 
+         /* CRC */
+-        priv->dotzsdb.crc = crc32c_hw(0, 0, 0);
+-        priv->dotzsdb.crc = crc32c_hw(priv->dotzsdb.crc,
++        priv->dotzsdb.crc = crc32c(0, 0, 0);
++        priv->dotzsdb.crc = crc32c(priv->dotzsdb.crc,
+                                       (void *)&priv->dotzsdb.signature,
+                                       sizeof(uint64_t));
+-        priv->dotzsdb.crc = crc32c_hw(priv->dotzsdb.crc,
++        priv->dotzsdb.crc = crc32c(priv->dotzsdb.crc,
+                                       (void *)&priv->dotzsdb.offset,
+                                       sizeof(uint64_t));
+-        priv->dotzsdb.crc = crc32c_hw(priv->dotzsdb.crc,
++        priv->dotzsdb.crc = crc32c(priv->dotzsdb.crc,
+                                       (void *)&priv->dotzsdb.uuidstr,
+                                       UUID_STRLEN);
+-        priv->dotzsdb.crc = crc32c_hw(priv->dotzsdb.crc,
++        priv->dotzsdb.crc = crc32c(priv->dotzsdb.crc,
+                                       (void *)&priv->dotzsdb.curidx,
+                                       sizeof(uint32_t));
+ 
+diff --git a/src/zeroskip-file.c b/src/zeroskip-file.c
+index 9e2b4f3..8f00b57 100644
+--- a/src/zeroskip-file.c
++++ b/src/zeroskip-file.c
+@@ -280,18 +280,18 @@ int zs_file_write_commit_record(struct zsdb_file *f, int final)
+                 val = ((uint64_t)lc.type1 << 56); /* type 1 */
+                 write_be64(ptr + pos, val);
+                 pos += sizeof(uint64_t);
+-                lccrc = crc32c_hw(crc, (void *)&val, sizeof(uint64_t));
++                lccrc = crc32c(crc, (void *)&val, sizeof(uint64_t));
+ 
+                 val = lc.length;
+                 write_be64(ptr + pos, val); /* length */
+                 pos += sizeof(uint64_t);
+-                lccrc = crc32c_hw(lccrc, (void *)&val, sizeof(uint64_t));
++                lccrc = crc32c(lccrc, (void *)&val, sizeof(uint64_t));
+ 
+                 val = 0;
+                 val = ((uint64_t)lc.type2 << 56); /* type 2 */
+ 
+                 /* The final CRC  */
+-                lccrc = crc32c_hw(lccrc, (void *)&val, sizeof(uint64_t));
++                lccrc = crc32c(lccrc, (void *)&val, sizeof(uint64_t));
+                 lc.crc32 = lccrc;
+ 
+                 val |= (uint64_t)lc.crc32;        /* crc */
+@@ -315,7 +315,7 @@ int zs_file_write_commit_record(struct zsdb_file *f, int final)
+                 val = ((uint64_t)sc.type << 56);               /* type */
+                 val |= ((uint64_t)sc.length << 32);            /* length */
+                 /* The final CRC  */
+-                sccrc = crc32c_hw(crc, (void *)&val, sizeof(uint64_t));
++                sccrc = crc32c(crc, (void *)&val, sizeof(uint64_t));
+ 
+                 sc.crc32 = sccrc;
+ 
+diff --git a/src/zeroskip-header.c b/src/zeroskip-header.c
+index 4fc7b9c..cae5be4 100644
+--- a/src/zeroskip-header.c
++++ b/src/zeroskip-header.c
+@@ -42,7 +42,7 @@ int zs_header_write(struct zsdb_file *f)
+                 return ZS_ERROR;
+         }
+ 
+-        crc = crc32c_hw(0, 0, 0);
++        crc = crc32c(0, 0, 0);
+ 
+         /* Signature */
+         memcpy(sptr, &f->header.signature, sizeof(uint64_t));
+@@ -67,12 +67,12 @@ int zs_header_write(struct zsdb_file *f)
+         /* compute the crc32 of the the fields of the header minus the
+            crc32 field */
+ 
+-        crc = crc32c_hw(0, 0, 0);
+-        crc = crc32c_hw(crc, (void *)&f->header.signature, sizeof(uint64_t));
+-        crc = crc32c_hw(crc, (void *)&f->header.version, sizeof(uint32_t));
+-        crc = crc32c_hw(crc, (void *)&f->header.uuid, sizeof(uuid_t));
+-        crc = crc32c_hw(crc, (void *)&f->header.startidx, sizeof(uint32_t));
+-        crc = crc32c_hw(crc, (void *)&f->header.endidx, sizeof(uint32_t));
++        crc = crc32c(0, 0, 0);
++        crc = crc32c(crc, (void *)&f->header.signature, sizeof(uint64_t));
++        crc = crc32c(crc, (void *)&f->header.version, sizeof(uint32_t));
++        crc = crc32c(crc, (void *)&f->header.uuid, sizeof(uuid_t));
++        crc = crc32c(crc, (void *)&f->header.startidx, sizeof(uint32_t));
++        crc = crc32c(crc, (void *)&f->header.endidx, sizeof(uint32_t));
+         *((uint32_t *)sptr) = hton32(crc);
+         sptr += sizeof(uint32_t);
+ 
+@@ -153,12 +153,12 @@ int zs_header_validate(struct zsdb_file *f)
+         f->header.crc32 = ntoh32(phdr->crc32);
+ 
+         /* Check CRC32 */
+-        crc = crc32c_hw(0, 0, 0);
+-        crc = crc32c_hw(crc, (void *)&f->header.signature, sizeof(uint64_t));
+-        crc = crc32c_hw(crc, (void *)&f->header.version, sizeof(uint32_t));
+-        crc = crc32c_hw(crc, (void *)&f->header.uuid, sizeof(uuid_t));
+-        crc = crc32c_hw(crc, (void *)&f->header.startidx, sizeof(uint32_t));
+-        crc = crc32c_hw(crc, (void *)&f->header.endidx, sizeof(uint32_t));
++        crc = crc32c(0, 0, 0);
++        crc = crc32c(crc, (void *)&f->header.signature, sizeof(uint64_t));
++        crc = crc32c(crc, (void *)&f->header.version, sizeof(uint32_t));
++        crc = crc32c(crc, (void *)&f->header.uuid, sizeof(uuid_t));
++        crc = crc32c(crc, (void *)&f->header.startidx, sizeof(uint32_t));
++        crc = crc32c(crc, (void *)&f->header.endidx, sizeof(uint32_t));
+ 
+         if (crc != f->header.crc32) {
+                 zslog(LOGDEBUG, "Checksum failed for zeroskip header: %u, expected: %u.\n",
+diff --git a/src/zeroskip-packed.c b/src/zeroskip-packed.c
+index c7f70b4..b1e149a 100644
+--- a/src/zeroskip-packed.c
++++ b/src/zeroskip-packed.c
+@@ -295,21 +295,21 @@ int zs_packed_file_open(const char *path,
+ 
+                 /* compute the crc */
+                 /* data */
+-                crc = crc32c_hw(0, (void *)(f->mf->ptr + offset), (end_offset - offset));
++                crc = crc32c(0, (void *)(f->mf->ptr + offset), (end_offset - offset));
+ 
+                 /* type1 */
+                 t_data = read_be64(dataptr);
+-                crc = crc32c_hw(crc, (void *)&t_data, sizeof(uint64_t));
++                crc = crc32c(crc, (void *)&t_data, sizeof(uint64_t));
+                 dataptr = dataptr + sizeof(uint64_t);
+ 
+                 /* len */
+                 t_data = read_be64(dataptr);
+-                crc = crc32c_hw(crc, (void *)&t_data, sizeof(uint64_t));
++                crc = crc32c(crc, (void *)&t_data, sizeof(uint64_t));
+                 dataptr = dataptr + sizeof(uint64_t);
+ 
+                 /* type 2 */
+                 t_data = read_be64(dataptr) & 0xFF00000000000000;
+-                crc = crc32c_hw(crc, (void *)&t_data, sizeof(uint64_t));
++                crc = crc32c(crc, (void *)&t_data, sizeof(uint64_t));
+ 
+         } else if (commit_rec_type == REC_TYPE_FINAL) {
+                 unsigned char *dataptr;
+@@ -320,11 +320,11 @@ int zs_packed_file_open(const char *path,
+ 
+                 /* compute the crc */
+                 /* data */
+-                crc = crc32c_hw(0, (void *)(f->mf->ptr + offset), (end_offset - offset));
++                crc = crc32c(0, (void *)(f->mf->ptr + offset), (end_offset - offset));
+ 
+                 /* type & len */
+                 t_data = read_be64(dataptr) & 0xFFFFFFFF00000000;
+-                crc = crc32c_hw(crc, (void *)&t_data, sizeof(uint64_t));
++                crc = crc32c(crc, (void *)&t_data, sizeof(uint64_t));
+         } else {
+                 /* Should not reach here */
+                 abort();
+diff --git a/src/zeroskip-record.c b/src/zeroskip-record.c
+index 411af45..1f856ef 100644
+--- a/src/zeroskip-record.c
++++ b/src/zeroskip-record.c
+@@ -209,7 +209,7 @@ static int zs_read_and_verify_commit_record(struct zsdb_file *f,
+                 /* offset is the end of the short commit record */
+                 *offset = *offset + ZS_SHORT_COMMIT_REC_SIZE;
+ 
+-                crc = crc32c_hw(0, 0, 0);
++                crc = crc32c(0, 0, 0);
+ 
+                 sc.type = rectype;
+                 sc.length = (data >> 32) & 0xFFFFFF;
+@@ -221,8 +221,8 @@ static int zs_read_and_verify_commit_record(struct zsdb_file *f,
+                 /* The commit record without the CRC */
+                 val = data & 0xFFFFFFFF00000000;
+ 
+-                crc = crc32c_hw(crc, (void *)rptr, sc.length);
+-                crc = crc32c_hw(crc, (void *)&val, sizeof(uint64_t));
++                crc = crc32c(crc, (void *)rptr, sc.length);
++                crc = crc32c(crc, (void *)&val, sizeof(uint64_t));
+ 
+                 if (sc.crc32 != crc) {
+                         zslog(LOGWARNING, "Checksum failed for record at offset: %zu\n",
+@@ -240,7 +240,7 @@ static int zs_read_and_verify_commit_record(struct zsdb_file *f,
+                 *offset = *offset + ZS_LONG_COMMIT_REC_SIZE;
+ 
+                 /* Begin computing */
+-                crc = crc32c_hw(0, 0, 0);
++                crc = crc32c(0, 0, 0);
+ 
+                 lc.type1 = rectype;
+                 lc.length = read_be64(fptr + sizeof(uint64_t));
+@@ -253,10 +253,10 @@ static int zs_read_and_verify_commit_record(struct zsdb_file *f,
+                 rptr = fptr - lc.length;
+ 
+                 val = 0;        /* 0 used to compute CRC */
+-                crc = crc32c_hw(crc, (void *)rptr, lc.length);
+-                crc = crc32c_hw(crc, (void *)&data, sizeof(uint64_t));
+-                crc = crc32c_hw(crc, (void *)lc.length, sizeof(uint64_t));
+-                crc = crc32c_hw(crc, (void *)&val, sizeof(uint64_t));
++                crc = crc32c(crc, (void *)rptr, lc.length);
++                crc = crc32c(crc, (void *)&data, sizeof(uint64_t));
++                crc = crc32c(crc, (void *)lc.length, sizeof(uint64_t));
++                crc = crc32c(crc, (void *)&val, sizeof(uint64_t));
+ 
+                 if (lc.crc32 != crc) {
+                         zslog(LOGWARNING, "Checksum failed for record at offset: %zu\n",
+-- 
+2.39.1
+

@@ -25034,6 +25034,8 @@ with pkgs;
 
   couchdb3 = callPackage ../servers/http/couchdb/3.nix { };
 
+  cyrus-imapd = callPackage ../servers/mail/cyrus-imapd { };
+
   dcnnt = python3Packages.callPackage ../servers/dcnnt { };
 
   dendrite = callPackage ../servers/dendrite { };

@@ -1,0 +1,25 @@
+From 82d635e0e83c5287ee214e20c31a674d13fcac5a Mon Sep 17 00:00:00 2001
+From: Jacob Vallejo <jake@jahkeup.com>
+Date: Wed, 10 May 2023 10:49:33 -0700
+Subject: [PATCH] fix: breaking change to force polyfill
+
+---
+ src/libzeroskip.symbols | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/src/libzeroskip.symbols b/src/libzeroskip.symbols
+index d15b9b2..b4e328d 100644
+--- a/src/libzeroskip.symbols
++++ b/src/libzeroskip.symbols
+@@ -112,8 +112,6 @@ cstring_trim
+ 
+ crc32c_init
+ crc32c
+-crc32c_sw
+-crc32c_hw
+ crc32c_map
+ crc32c_buf
+ crc32c_cstring
+-- 
+2.39.1
+

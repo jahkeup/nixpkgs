@@ -1,14 +1,14 @@
 { stdenv, lib, pkgs, cyrus_sasl, ... }:
 
 let
-  zeroskip = pkgs.callPackage ./zeroskip.nix { };
+  zeroskip = pkgs.callPackage ./zeroskip { };
 in
 
 # We support
 { version, rev ? "cyrus-imapd-${version}", sha256 ? "", patches ? [ ]
 , sasl ? cyrus_sasl, ... }:
 
-stdenv.mkDerivation {
+stdenv.mkDerivation (finalAttrs: {
   pname = "cyrus-imapd";
   inherit version;
 
@@ -16,12 +16,12 @@ stdenv.mkDerivation {
     owner = "cyrusimap";
     repo = "cyrus-imapd";
 
-    name = "cyrus-imapd-source-${version}";
+    name = "${finalAttrs.pname}-${finalAttrs.version}-source";
 
     inherit rev sha256;
   };
 
-  patches = [ ./stat-field.patch ./fix-ulong.patch ] ++ patches;
+  patches = [ ./fix-ulong.patch ./stat-field.patch ] ++ patches;
 
   # https://www.cyrusimap.org/3.8/imap/developer/compiling.html#required-build-dependencies
   buildInputs = [
@@ -46,14 +46,14 @@ stdenv.mkDerivation {
     pkgs.zlib
     zeroskip
     pkgs.clamav
+    pkgs.cunit
   ];
 
   configureFlags = [ "--with-krbimpl=mit" "--enable-unit-tests" ];
 
   CFLAGS = [ "-D_POSIX_C_SOURCE=200809L" ];
 
-  doCheck = true;
-  nativeCheckInputs = [ pkgs.cunit ];
+  doCheck = stdenv.isLinux;
 
   nativeBuildInputs = [
     pkgs.pkgconfig
@@ -62,5 +62,7 @@ stdenv.mkDerivation {
     pkgs.flex
     pkgs.autoreconfHook
     pkgs.perl
+    pkgs.sphinx
+    pkgs.doxygen
   ];
-}
+})
