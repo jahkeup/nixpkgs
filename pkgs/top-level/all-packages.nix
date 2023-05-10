@@ -24341,6 +24341,8 @@ with pkgs;
 
   wlr-protocols = callPackage ../development/libraries/wlroots/protocols.nix { };
 
+  wslay = callPackage ../development/libraries/wslay { };
+
   wt = wt4;
   inherit (callPackages ../development/libraries/wt {
     boost = boost175;

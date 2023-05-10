@@ -1,0 +1,39 @@
+From a35b4825f5468b8f81b71afb87aa35c788b50187 Mon Sep 17 00:00:00 2001
+From: Jacob Vallejo <jake@jahkeup.com>
+Date: Mon, 8 May 2023 22:18:11 -0700
+Subject: [PATCH] fix: ulong -> unsigned long
+
+---
+ imap/http_client.h | 2 +-
+ imap/httpd.h       | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/imap/http_client.h b/imap/http_client.h
+index 75b7f7820..7ca5fe711 100644
+--- a/imap/http_client.h
++++ b/imap/http_client.h
+@@ -58,7 +58,7 @@ struct body_t {
+     unsigned char framing;              /* Message framing   */
+     unsigned char te;                   /* Transfer-Encoding */
+     unsigned max;                       /* Max allowed len   */
+-    ulong len;                          /* Content-Length    */
++    unsigned long len;                          /* Content-Length    */
+     struct buf payload;                 /* Payload           */
+ };
+ 
+diff --git a/imap/httpd.h b/imap/httpd.h
+index 6583ece5c..224fcdff8 100644
+--- a/imap/httpd.h
++++ b/imap/httpd.h
+@@ -289,7 +289,7 @@ typedef int (*encode_proc_t)(struct transaction_t *txn,
+ 
+ /* Meta-data for response body (payload & representation headers) */
+ struct resp_body_t {
+-    ulong len;                          /* Content-Length   */
++    unsigned long len;                          /* Content-Length   */
+     struct range *range;                /* Content-Range    */
+     struct {
+         const char *fname;
+-- 
+2.39.1
+

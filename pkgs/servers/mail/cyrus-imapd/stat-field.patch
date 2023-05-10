@@ -1,0 +1,32 @@
+From bf7f5608af030fa10924c51a243cb1ed017eb461 Mon Sep 17 00:00:00 2001
+From: Jacob Vallejo <jake@jahkeup.com>
+Date: Mon, 8 May 2023 22:04:03 -0700
+Subject: [PATCH] fix: handle darwin field differences
+
+---
+ lib/util.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lib/util.c b/lib/util.c
+index a2a291e43..154ab222e 100644
+--- a/lib/util.c
++++ b/lib/util.c
+@@ -625,13 +625,13 @@ static int _copyfile_helper(const char *from, const char *to, int flags)
+ 
+     if (keeptime) {
+         int ret;
+-#if defined(HAVE_FUTIMENS)
++#if defined(HAVE_FUTIMENS) && !defined(__APPLE__)
+         struct timespec ts[2];
+ 
+         ts[0] = sbuf.st_atim;
+         ts[1] = sbuf.st_mtim;
+         ret = futimens(destfd, ts);
+-#elif defined(HAVE_FUTIMES)
++#elif defined(HAVE_FUTIMES) && !defined(__APPLE__)
+         struct timeval tv[2];
+ 
+         TIMESPEC_TO_TIMEVAL(&tv[0], &sbuf.st_atim);
+-- 
+2.39.1
+

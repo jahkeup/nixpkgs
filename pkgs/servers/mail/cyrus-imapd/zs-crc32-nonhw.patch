@@ -1,0 +1,24 @@
+From 35b2ddb6ceeab44e4c7fe085c9c44345c493870a Mon Sep 17 00:00:00 2001
+From: Jacob Vallejo <jake@jahkeup.com>
+Date: Mon, 8 May 2023 23:39:01 -0700
+Subject: [PATCH] add check for available hw call
+
+---
+ configure.ac | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/configure.ac b/configure.ac
+index be5414e..ce1f755 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -207,6 +207,7 @@ AC_CHECK_MEMBERS([struct stat.st_mtim.tv_nsec],,,[
+ # check for library functions
+ AC_CHECK_FUNCS([getopt_long])
+ AC_CHECK_FUNCS([memmem])
++AC_CHECK_FUNCS([_crc32c_hw])
+ 
+ # checks for supported compiler options
+ AX_APPEND_COMPILE_FLAGS([ \
+-- 
+2.39.1
+
